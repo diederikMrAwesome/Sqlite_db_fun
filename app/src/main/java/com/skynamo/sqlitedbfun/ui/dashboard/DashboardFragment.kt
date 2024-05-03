@@ -50,6 +50,8 @@ class DashboardFragment : Fragment() {
         var flutterFragment = fragmentManager
             .findFragmentByTag(TAG_FLUTTER_FRAGMENT) as FlutterFragment?
 
+        var a = context?.getExternalFilesDir(null);
+
         // Create and attach a FlutterFragment if one does not exist.
         if (flutterFragment == null) {
             flutterFragment = FlutterFragment.createDefault()

@@ -38,9 +38,9 @@ class $DataItemsTable extends DataItems
       const VerificationMeta('isActive');
   @override
   late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
-      'is_active', aliasedName, false,
+      'is_active', aliasedName, true,
       type: DriftSqlType.bool,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_active" IN (0, 1))'));
   @override
@@ -49,7 +49,7 @@ class $DataItemsTable extends DataItems
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'data_items';
+  static const String $name = 'dataitem';
   @override
   VerificationContext validateIntegrity(Insertable<DataItem> instance,
       {bool isInserting = false}) {
@@ -77,8 +77,6 @@ class $DataItemsTable extends DataItems
     if (data.containsKey('is_active')) {
       context.handle(_isActiveMeta,
           isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta));
-    } else if (isInserting) {
-      context.missing(_isActiveMeta);
     }
     return context;
   }
@@ -98,7 +96,7 @@ class $DataItemsTable extends DataItems
       age: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}age']),
       isActive: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}is_active'])!,
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_active']),
     );
   }
 
@@ -113,13 +111,13 @@ class DataItem extends DataClass implements Insertable<DataItem> {
   final String username;
   final String email;
   final int? age;
-  final bool isActive;
+  final bool? isActive;
   const DataItem(
       {required this.id,
       required this.username,
       required this.email,
       this.age,
-      required this.isActive});
+      this.isActive});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -129,7 +127,9 @@ class DataItem extends DataClass implements Insertable<DataItem> {
     if (!nullToAbsent || age != null) {
       map['age'] = Variable<int>(age);
     }
-    map['is_active'] = Variable<bool>(isActive);
+    if (!nullToAbsent || isActive != null) {
+      map['is_active'] = Variable<bool>(isActive);
+    }
     return map;
   }
 
@@ -139,7 +139,9 @@ class DataItem extends DataClass implements Insertable<DataItem> {
       username: Value(username),
       email: Value(email),
       age: age == null && nullToAbsent ? const Value.absent() : Value(age),
-      isActive: Value(isActive),
+      isActive: isActive == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isActive),
     );
   }
 
@@ -151,7 +153,7 @@ class DataItem extends DataClass implements Insertable<DataItem> {
       username: serializer.fromJson<String>(json['username']),
       email: serializer.fromJson<String>(json['email']),
       age: serializer.fromJson<int?>(json['age']),
-      isActive: serializer.fromJson<bool>(json['isActive']),
+      isActive: serializer.fromJson<bool?>(json['isActive']),
     );
   }
   @override
@@ -162,7 +164,7 @@ class DataItem extends DataClass implements Insertable<DataItem> {
       'username': serializer.toJson<String>(username),
       'email': serializer.toJson<String>(email),
       'age': serializer.toJson<int?>(age),
-      'isActive': serializer.toJson<bool>(isActive),
+      'isActive': serializer.toJson<bool?>(isActive),
     };
   }
 
@@ -171,13 +173,13 @@ class DataItem extends DataClass implements Insertable<DataItem> {
           String? username,
           String? email,
           Value<int?> age = const Value.absent(),
-          bool? isActive}) =>
+          Value<bool?> isActive = const Value.absent()}) =>
       DataItem(
         id: id ?? this.id,
         username: username ?? this.username,
         email: email ?? this.email,
         age: age.present ? age.value : this.age,
-        isActive: isActive ?? this.isActive,
+        isActive: isActive.present ? isActive.value : this.isActive,
       );
   @override
   String toString() {
@@ -209,7 +211,7 @@ class DataItemsCompanion extends UpdateCompanion<DataItem> {
   final Value<String> username;
   final Value<String> email;
   final Value<int?> age;
-  final Value<bool> isActive;
+  final Value<bool?> isActive;
   const DataItemsCompanion({
     this.id = const Value.absent(),
     this.username = const Value.absent(),
@@ -222,10 +224,9 @@ class DataItemsCompanion extends UpdateCompanion<DataItem> {
     required String username,
     required String email,
     this.age = const Value.absent(),
-    required bool isActive,
+    this.isActive = const Value.absent(),
   })  : username = Value(username),
-        email = Value(email),
-        isActive = Value(isActive);
+        email = Value(email);
   static Insertable<DataItem> custom({
     Expression<int>? id,
     Expression<String>? username,
@@ -247,7 +248,7 @@ class DataItemsCompanion extends UpdateCompanion<DataItem> {
       Value<String>? username,
       Value<String>? email,
       Value<int?>? age,
-      Value<bool>? isActive}) {
+      Value<bool?>? isActive}) {
     return DataItemsCompanion(
       id: id ?? this.id,
       username: username ?? this.username,

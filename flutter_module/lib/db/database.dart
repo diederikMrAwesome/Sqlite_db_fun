@@ -14,7 +14,11 @@ class DataItems extends Table {
   TextColumn get username => text()();
   TextColumn get email => text()();
   IntColumn get age => integer().nullable()();
-  BoolColumn get isActive => boolean()();
+  BoolColumn get isActive => boolean().nullable()();
+
+  @override
+  String get tableName => 'dataitem';
+
 }
 
 @DriftDatabase(tables: [DataItems])
@@ -45,6 +49,8 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
 
     final file = File("/data/data/com.skynamo.sqlitedbfun/databases/data.db");
+    // NOTE this might change with different path to app and or root external folder
+    final tempFolder = File("/storage/emulated/0/Android/data/com.skynamo.sqlitedbfun/files");
 
     // Also work around limitations on old Android versions
     if (Platform.isAndroid) {
@@ -53,7 +59,7 @@ LazyDatabase _openConnection() {
 
     // Make sqlite3 pick a more suitable location for temporary files - the
     // one from the system may be inaccessible due to sandboxing.
-    final cachebase = (await getTemporaryDirectory()).path;
+    final cachebase = tempFolder.path;
     // We can't access /tmp on Android, which sqlite3 would try by default.
     // Explicitly tell it about the correct temporary directory.
     sqlite3.tempDirectory = cachebase;
@@ -63,7 +69,7 @@ LazyDatabase _openConnection() {
     Database database =
     sqlite3.open(file.path, mode: OpenMode.readWriteCreate);
     return NativeDatabase.opened(database,
-        enableMigrations: true,
+        enableMigrations: false,
         closeUnderlyingOnClose: true,
         logStatements: true); //Log the sql statements i
   });

@@ -4,8 +4,11 @@ A new Flutter module project.
 
 ## Getting Started
 
-For help getting started with Flutter development, view the online
-[documentation](https://flutter.dev/).
+### Building
 
-For instructions integrating Flutter modules to your existing applications,
-see the [add-to-app documentation](https://flutter.dev/docs/development/add-to-app).
+`flutter build aar --no-profile --no-release`
+
+
+### Re-building the generated files (including drift db files)
+
+` dart run build_runner build`
