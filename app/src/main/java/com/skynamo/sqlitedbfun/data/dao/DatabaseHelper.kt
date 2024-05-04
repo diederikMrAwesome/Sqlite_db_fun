@@ -10,7 +10,7 @@ import com.skynamo.sqlitedbfun.data.DataItem
 class DatabaseHelper(context: Context) : OrmLiteSqliteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_NAME = "data.db"
+        const val DATABASE_NAME = "data.db"
         private const val DATABASE_VERSION = 1
     }
 

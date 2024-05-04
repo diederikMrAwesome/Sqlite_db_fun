@@ -1,25 +1,35 @@
 package com.skynamo.sqlitedbfun
 
 import android.os.Bundle
-import android.os.Handler
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.skynamo.sqlitedbfun.data.dao.DatabaseHelper
 import com.skynamo.sqlitedbfun.databinding.ActivityMainBinding
+import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val navItemsArray: Array<Int> = arrayOf(R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-
-    private val _handler = Handler()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Copy shipped db if needed
+        val dbFile = applicationContext.getDatabasePath(DatabaseHelper.DATABASE_NAME)
+        if (!dbFile.exists()) {
+            val inputStream = applicationContext.assets.open(DatabaseHelper.DATABASE_NAME)
+            val outputStream = FileOutputStream(dbFile)
+            inputStream.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
+                }
+            }
+        }
 
      binding = ActivityMainBinding.inflate(layoutInflater)
      setContentView(binding.root)
@@ -35,31 +45,5 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    override fun onStart() {
-        super.onStart()
-        _handler.postDelayed(task, TimeUnit.SECONDS.toMillis(10))
-    }
-
-    override fun onPause() {
-        super.onPause()
-        _handler.removeCallbacksAndMessages(null)
-    }
-
-    private val task = object : Runnable {
-        override fun run() {
-            // Do something here
-            goToNextNavItem()
-            // Reschedule the task to run again in 10 seconds
-            _handler.postDelayed(this, TimeUnit.SECONDS.toMillis(10))
-        }
-    }
-
-    private fun goToNextNavItem() {
-        var selectedId = binding.navView.selectedItemId
-        var selectedIndex = navItemsArray.indexOf(selectedId)
-        var newIndex = (selectedIndex+1) % navItemsArray.size
-        var newId = navItemsArray[newIndex]
-        binding.navView.selectedItemId = newId
-    }
 
 }

@@ -47,8 +47,8 @@ LazyDatabase _openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
 
-    final file = File("/data/data/com.skynamo.sqlitedbfun/databases/data.db");
-    // NOTE this might change with different path to app and or root external folder
+    // Warning hardcoded paths
+    final dbFile = File("/data/data/com.skynamo.sqlitedbfun/databases/data.db");
     final tempFolder = File("/storage/emulated/0/Android/data/com.skynamo.sqlitedbfun/files");
 
     // Also work around limitations on old Android versions
@@ -58,15 +58,15 @@ LazyDatabase _openConnection() {
 
     // Make sqlite3 pick a more suitable location for temporary files - the
     // one from the system may be inaccessible due to sandboxing.
-    final cachebase = tempFolder.path;
+    final cachePath = tempFolder.path;
     // We can't access /tmp on Android, which sqlite3 would try by default.
     // Explicitly tell it about the correct temporary directory.
-    sqlite3.tempDirectory = cachebase;
+    sqlite3.tempDirectory = cachePath;
 
-    // return NativeDatabase.createInBackground(file);
-
+    // Both open modes:
+    // OpenMode.readWriteCreate and OpenMode.readOnly cause SQLite db issues
     Database database =
-    sqlite3.open(file.path, mode: OpenMode.readWriteCreate);
+    sqlite3.open(dbFile.path, mode: OpenMode.readWriteCreate);
     return NativeDatabase.opened(database,
         enableMigrations: false,
         closeUnderlyingOnClose: true,

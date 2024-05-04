@@ -52,7 +52,10 @@ class HomeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        _binding?.textHome?.text = "Hallo world"
+
         _binding?.button?.setOnClickListener {
+            _binding?.textHome?.text = "Inserting data, now go to dashboard nav below to load flutter fragment"
             insertRandomUserData()
         }
 
