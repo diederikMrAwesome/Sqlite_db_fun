@@ -18,11 +18,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.sql.SQLException
+import kotlin.random.Random
 
 class HomeFragment : Fragment() {
 
+    companion object {
+        private var _dao: DataItemDao? = null
+    }
     // Static? Singleton?
-    private var _dao: DataItemDao? = null
     private var _binding: FragmentHomeBinding? = null
   // This property is only valid between onCreateView and
   // onDestroyView.
@@ -64,30 +67,33 @@ class HomeFragment : Fragment() {
         GlobalScope.launch(Dispatchers.IO) {
 
             val generator = DataItemGenerator()
-            // TODO do this while thing 1000 times. 
-            repeat(1000) {
-                val randomDataItem = generator.generateRandomUser()
-                // Insert the random user data item into the database
-                _dao?.createDataItem(randomDataItem)
-            }
 
-            try {
-                TransactionManager.callInTransaction(_dao?.databaseHelper?.connectionSource) {
-                    val updateBuilder: UpdateBuilder<DataItem, Int>? = _dao?.updateBuilder()
-                    updateBuilder?.updateColumnValue("age", 20)
-                    updateBuilder?.where()?.lt("age", 20)
-                    updateBuilder?.update()
+            repeat(3) {
+                repeat(1000) {
+                    val randomDataItem = generator.generateRandomUser()
+                    // Insert the random user data item into the database
+                    _dao?.createDataItem(randomDataItem)
                 }
-                // Show a toast message on the main/UI thread
-                launch(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Random data inserted", Toast.LENGTH_SHORT).show()
-                    _dao?.close()
-                    _dao = null
-                }
-            }  catch (e: SQLException) {
-                e.printStackTrace() // Handle the exception appropriately
-            }
 
+                try {
+                    TransactionManager.callInTransaction(_dao?.databaseHelper?.connectionSource) {
+                        val updateBuilder: UpdateBuilder<DataItem, Int>? = _dao?.updateBuilder()
+                        updateBuilder?.updateColumnValue("age", 20)
+                        updateBuilder?.where()?.lt("age", 20)
+                        updateBuilder?.update()
+
+                        updateBuilder?.reset()
+                        updateBuilder?.updateColumnValue("isActive", Random.nextBoolean())
+                        updateBuilder?.update()
+                    }
+                    // Show a toast message on the main/UI thread
+                    launch(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Random data inserted", Toast.LENGTH_SHORT).show()
+                    }
+                }  catch (e: SQLException) {
+                    e.printStackTrace() // Handle the exception appropriately
+                }
+            }
         }
     }
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_module/db/database.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
