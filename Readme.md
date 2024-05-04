@@ -50,6 +50,10 @@ I am able to reliably reproduce this on an Android emulator on Android API level
 I am using Android studio to build and run both the Android and Flutter apps.  I am currently running Flutter version 3.19.6. 
 Android build tools 35-rc3.
 
+After the Android and Flutter SDK have been installed, cd into the `flutter_module` folder.  
+Then run `flutter build aar --no-profile --no-release` to build the flutter part.  
+Then run Android build and run on Android project as per normal.
+
 ## Some more backstory
 
 We saw a very similar failure in the wild with our [app](https://skynamo.com/).  The failure was just a bit more sever:
