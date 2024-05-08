@@ -10,7 +10,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.skynamo.sqlitedbfun.data.dao.DatabaseHelper
 import com.skynamo.sqlitedbfun.databinding.ActivityMainBinding
 import java.io.FileOutputStream
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 

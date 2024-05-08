@@ -52,4 +52,5 @@ dependencies {
     debugImplementation("com.skynamo.flutter_module:flutter_debug:1.0")
 //    profileImplementation("com.skynamo.flutter_module:flutter_profile:1.0")
     releaseImplementation("com.skynamo.flutter_module:flutter_release:1.0")
+    debugImplementation("eu.simonbinder.sqlite3_flutter_libs:sqlite3_flutter_libs_debug:1.0")
 }

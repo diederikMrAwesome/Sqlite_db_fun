@@ -11,6 +11,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.skynamo.sqlitedbfun.R
 import com.skynamo.sqlitedbfun.databinding.FragmentDashboardBinding
 import io.flutter.embedding.android.FlutterFragment
+import io.flutter.embedding.android.FlutterFragment.CachedEngineFragmentBuilder
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.embedding.engine.dart.DartExecutor
+
+private const val ENGINE_ID = "engine_ID"
 
 class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
@@ -42,6 +48,7 @@ class DashboardFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        setupEngine()
 
         val fragmentManager: FragmentManager = childFragmentManager
 
@@ -50,11 +57,13 @@ class DashboardFragment : Fragment() {
         var flutterFragment = fragmentManager
             .findFragmentByTag(TAG_FLUTTER_FRAGMENT) as FlutterFragment?
 
-        var a = context?.getExternalFilesDir(null);
-
         // Create and attach a FlutterFragment if one does not exist.
         if (flutterFragment == null) {
-            flutterFragment = FlutterFragment.createDefault()
+
+            var flutterFragment
+            = CachedEngineFragmentBuilder(FlutterFragment::class.java, ENGINE_ID)
+                .build<FlutterFragment>()
+
             fragmentManager
                 .beginTransaction()
                 .add(
@@ -63,6 +72,22 @@ class DashboardFragment : Fragment() {
                     TAG_FLUTTER_FRAGMENT
                 )
                 .commit()
+        }
+    }
+
+    private fun setupEngine() {
+        var cachedEngine = FlutterEngineCache
+            .getInstance().get(ENGINE_ID)
+        if (cachedEngine == null) {
+            cachedEngine = FlutterEngine(requireContext())
+
+            // Start executing Dart code to pre-warm the FlutterEngine.
+            cachedEngine.dartExecutor.executeDartEntrypoint(
+                DartExecutor.DartEntrypoint.createDefault()
+            )
+
+            FlutterEngineCache
+                .getInstance().put(ENGINE_ID, cachedEngine)
         }
     }
 
