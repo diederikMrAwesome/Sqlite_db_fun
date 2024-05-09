@@ -53,9 +53,9 @@ LazyDatabase _openConnection() {
     final tempFolder = File("/storage/emulated/0/Android/data/com.skynamo.sqlitedbfun/files");
 
     // Also work around limitations on old Android versions
-    // if (Platform.isAndroid) {
-    //   await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
-    // }
+    if (Platform.isAndroid) {
+      await applyWorkaroundToOpenSqlite3OnOldAndroidVersions();
+    }
 
     // Make sqlite3 pick a more suitable location for temporary files - the
     // one from the system may be inaccessible due to sandboxing.
@@ -66,14 +66,14 @@ LazyDatabase _openConnection() {
 
     // Both open modes:
     // OpenMode.readWriteCreate and OpenMode.readOnly cause SQLite db issues
-    // Database database =
-    // sqlite3.open(dbFile.path, mode: OpenMode.readWriteCreate);
-    // return NativeDatabase.opened(database,
-    //     enableMigrations: false,
-    //     closeUnderlyingOnClose: true,
-    //     logStatements: true); //Log the sql statements i
+    Database database =
+    sqlite3.open(dbFile.path, mode: OpenMode.readWriteCreate);
+    return NativeDatabase.opened(database,
+        enableMigrations: false,
+        closeUnderlyingOnClose: true,
+        logStatements: true); //Log the sql statements i
 
-    return SqfliteQueryExecutor.inDatabaseFolder(path: dbFile.path);
+    // return SqfliteQueryExecutor.inDatabaseFolder(path: dbFile.path);
 
   });
 }
